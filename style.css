@@ -1,157 +1,109 @@
-<!DOCTYPE html>
-<html lang="pt-BR">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Simulador - Lava-Jato Automatizado</title>
-  <!-- Vincula o arquivo CSS separado -->
-  <link rel="stylesheet" href="style.css">
-</head>
-<body>
+body {
+  font-family: Arial, sans-serif;
+  background-color: #070d1f; /* Azul escuro profundo no fundo */
+  color: #ffffff;
+  display: flex;
+  justify-content: center;
+  padding: 30px;
+}
 
-<div class="painel">
-  <h2>Lava-Jato Automatizado</h2>
+.painel {
+  background-color: #0f1c3f; /* Azul escuro principal */
+  border: 2px solid #ff2a85; /* Borda rosa vibrante */
+  border-radius: 12px;
+  padding: 25px;
+  width: 100%;
+  max-width: 500px;
+  box-shadow: 0 6px 20px rgba(255, 42, 133, 0.25);
+}
 
-  <!-- Simulação do Sensor LDR (Pino A0) -->
-  <div class="sensor-box">
-    <label for="ldrSlider"><strong>Sensor LDR (Luminosidade):</strong> <span id="ldrValor">800</span></label>
-    <input type="range" id="ldrSlider" min="0" max="1023" value="800">
-    <small>Limiar de detecção: menor que 400 (carro bloqueando a luz)</small>
-    <button onclick="simularCarro()">Simular Passagem do Carro</button>
-  </div>
+h2 {
+  margin-top: 0;
+  text-align: center;
+  color: #ffdd00; /* Amarelo vibrante no título */
+}
 
-  <!-- Componentes de Saída -->
-  <div class="status-grid">
-    <div class="card">
-      <div>LED Vermelho (Pino 2)</div>
-      <div id="ledVermelho" class="led vermelho ativo"></div>
-      <span id="txtLedVermelho">LIGADO</span>
-    </div>
+.sensor-box {
+  background: #172a5e; /* Azul escuro intermediário */
+  border-left: 4px solid #ffdd00; /* Detalhe em amarelo */
+  padding: 15px;
+  border-radius: 8px;
+  margin-bottom: 20px;
+}
 
-    <div class="card">
-      <div>LED Verde (Pino 3)</div>
-      <div id="ledVerde" class="led verde"></div>
-      <span id="txtLedVerde">DESLIGADO</span>
-    </div>
+input[type="range"] {
+  width: 100%;
+  margin: 10px 0;
+  accent-color: #ff2a85; /* Controle deslizante em rosa */
+}
 
-    <div class="card">
-      <div>Cancela (Pino 9)</div>
-      <p id="statusCancela" class="ativo-texto">0° (Fechada)</p>
-    </div>
+.status-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  margin-bottom: 20px;
+}
 
-    <div class="card">
-      <div>Escovas (Pino 4)</div>
-      <p id="statusEscovas">DESLIGADAS</p>
-    </div>
+.card {
+  background: #172a5e; /* Azul escuro intermediário */
+  border: 1px solid #26428b;
+  padding: 15px;
+  border-radius: 8px;
+  text-align: center;
+}
 
-    <div class="card card-largo">
-      <div>Bomba de Enxágue (Pino 7)</div>
-      <p id="statusBomba">DESLIGADA</p>
-    </div>
-  </div>
+.card-largo {
+  grid-column: span 2;
+}
 
-  <div class="fase-atual" id="faseTexto">
-    Aguardando veículo...
-  </div>
-</div>
+.led {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  margin: 8px auto;
+  background-color: #0a122a;
+  transition: 0.3s;
+}
 
-<script>
-  const limiarDeteccao = 400;
-  let cicloEmAndamento = false;
+.led.vermelho.ativo {
+  background-color: #ff3b30;
+  box-shadow: 0 0 12px #ff3b30;
+}
 
-  const ldrSlider = document.getElementById("ldrSlider");
-  const ldrValor = document.getElementById("ldrValor");
+.led.verde.ativo {
+  background-color: #34c759;
+  box-shadow: 0 0 12px #34c759;
+}
 
-  function delay(ms) {
-    return new Promise(resolve => setTimeout(resolve, ms));
-  }
+.ativo-texto {
+  color: #ffdd00; /* Amarelo para destacar status ativos */
+  font-weight: bold;
+}
 
-  function atualizarComponentes({ vermelho, verde, cancela, escovas, bomba, fase }) {
-    const elVermelho = document.getElementById("ledVermelho");
-    const elVerde = document.getElementById("ledVerde");
+.fase-atual {
+  background: #ffdd00; /* Destaque amarelo na barra de fase */
+  color: #070d1f; /* Texto azul escuro para leitura nítida */
+  padding: 15px;
+  border-radius: 8px;
+  text-align: center;
+  font-weight: bold;
+  font-size: 1.1em;
+}
 
-    elVermelho.classList.toggle("ativo", vermelho);
-    document.getElementById("txtLedVermelho").innerText = vermelho ? "LIGADO" : "DESLIGADO";
+button {
+  width: 100%;
+  padding: 12px;
+  background-color: #ff2a85; /* Botão rosa vibrante */
+  color: #ffffff;
+  font-weight: bold;
+  border: none;
+  border-radius: 6px;
+  font-size: 1em;
+  cursor: pointer;
+  margin-top: 10px;
+  transition: background-color 0.2s;
+}
 
-    elVerde.classList.toggle("ativo", verde);
-    document.getElementById("txtLedVerde").innerText = verde ? "LIGADO" : "DESLIGADO";
-
-    document.getElementById("statusCancela").innerText = cancela === 90 ? "90° (Aberta)" : "0° (Fechada)";
-    
-    const elEscovas = document.getElementById("statusEscovas");
-    elEscovas.innerText = escovas ? "LIGADAS (Sabão)" : "DESLIGADAS";
-    elEscovas.className = escovas ? "ativo-texto" : "";
-
-    const elBomba = document.getElementById("statusBomba");
-    elBomba.innerText = bomba ? "LIGADA (Água Filtrada)" : "DESLIGADA";
-    elBomba.className = bomba ? "ativo-texto" : "";
-
-    document.getElementById("faseTexto").innerText = fase;
-  }
-
-  setInterval(() => {
-    const leituraLDR = parseInt(ldrSlider.value);
-    ldrValor.innerText = leituraLDR;
-
-    if (leituraLDR < limiarDeteccao && !cicloEmAndamento) {
-      executarCicloLavagem();
-    }
-  }, 200);
-
-  async function executarCicloLavagem() {
-    cicloEmAndamento = true;
-
-    // Fase 1: Liberação de Entrada
-    atualizarComponentes({
-      vermelho: false, verde: true, cancela: 90, escovas: false, bomba: false,
-      fase: "Fase 1: Liberação de Entrada (3.5s)"
-    });
-    await delay(3500);
-
-    // Fase 2: Bloqueio e Início do Processamento
-    atualizarComponentes({
-      vermelho: true, verde: false, cancela: 0, escovas: false, bomba: false,
-      fase: "Fase 2: Bloqueio e Início (1s)"
-    });
-    await delay(1000);
-
-    // Fase 3: Esfregagem Automatizada
-    atualizarComponentes({
-      vermelho: true, verde: false, cancela: 0, escovas: true, bomba: false,
-      fase: "Fase 3: Esfregagem Automatizada (5s)"
-    });
-    await delay(5000);
-
-    // Fase 4: Enxágue Otimizado
-    atualizarComponentes({
-      vermelho: true, verde: false, cancela: 0, escovas: false, bomba: true,
-      fase: "Fase 4: Enxágue com Água Filtrada (4s)"
-    });
-    await delay(4000);
-
-    // Fase 5: Saída Liberada
-    atualizarComponentes({
-      vermelho: false, verde: true, cancela: 90, escovas: false, bomba: false,
-      fase: "Fase 5: Saída Liberada (4s)"
-    });
-    await delay(4000);
-
-    // Retorno ao repouso
-    ldrSlider.value = 800;
-    ldrValor.innerText = 800;
-    atualizarComponentes({
-      vermelho: true, verde: false, cancela: 0, escovas: false, bomba: false,
-      fase: "Aguardando veículo..."
-    });
-
-    cicloEmAndamento = false;
-  }
-
-  function simularCarro() {
-    ldrSlider.value = 250;
-    ldrValor.innerText = 250;
-  }
-</script>
-
-</body>
-</html>
+button:hover {
+  background-color: #d91b6c; /* Rosa mais escuro ao passar o mouse */
+}
