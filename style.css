@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Simulador - Lava-Jato Automatizado</title>
+  <!-- Vincula o arquivo CSS separado -->
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<div class="painel">
+  <h2>Lava-Jato Automatizado</h2>
+
+  <!-- Simulação do Sensor LDR (Pino A0) -->
+  <div class="sensor-box">
+    <label for="ldrSlider"><strong>Sensor LDR (Luminosidade):</strong> <span id="ldrValor">800</span></label>
+    <input type="range" id="ldrSlider" min="0" max="1023" value="800">
+    <small>Limiar de detecção: menor que 400 (carro bloqueando a luz)</small>
+    <button onclick="simularCarro()">Simular Passagem do Carro</button>
+  </div>
+
+  <!-- Componentes de Saída -->
+  <div class="status-grid">
+    <div class="card">
+      <div>LED Vermelho (Pino 2)</div>
+      <div id="ledVermelho" class="led vermelho ativo"></div>
+      <span id="txtLedVermelho">LIGADO</span>
+    </div>
+
+    <div class="card">
+      <div>LED Verde (Pino 3)</div>
+      <div id="ledVerde" class="led verde"></div>
+      <span id="txtLedVerde">DESLIGADO</span>
+    </div>
+
+    <div class="card">
+      <div>Cancela (Pino 9)</div>
+      <p id="statusCancela" class="ativo-texto">0° (Fechada)</p>
+    </div>
+
+    <div class="card">
+      <div>Escovas (Pino 4)</div>
+      <p id="statusEscovas">DESLIGADAS</p>
+    </div>
+
+    <div class="card card-largo">
+      <div>Bomba de Enxágue (Pino 7)</div>
+      <p id="statusBomba">DESLIGADA</p>
+    </div>
+  </div>
+
+  <div class="fase-atual" id="faseTexto">
+    Aguardando veículo...
+  </div>
+</div>
+
+<script>
+  const limiarDeteccao = 400;
+  let cicloEmAndamento = false;
+
+  const ldrSlider = document.getElementById("ldrSlider");
+  const ldrValor = document.getElementById("ldrValor");
+
+  function delay(ms) {
+    return new Promise(resolve => setTimeout(resolve, ms));
+  }
+
+  function atualizarComponentes({ vermelho, verde, cancela, escovas, bomba, fase }) {
+    const elVermelho = document.getElementById("ledVermelho");
+    const elVerde = document.getElementById("ledVerde");
+
+    elVermelho.classList.toggle("ativo", vermelho);
+    document.getElementById("txtLedVermelho").innerText = vermelho ? "LIGADO" : "DESLIGADO";
+
+    elVerde.classList.toggle("ativo", verde);
+    document.getElementById("txtLedVerde").innerText = verde ? "LIGADO" : "DESLIGADO";
+
+    document.getElementById("statusCancela").innerText = cancela === 90 ? "90° (Aberta)" : "0° (Fechada)";
+    
+    const elEscovas = document.getElementById("statusEscovas");
+    elEscovas.innerText = escovas ? "LIGADAS (Sabão)" : "DESLIGADAS";
+    elEscovas.className = escovas ? "ativo-texto" : "";
+
+    const elBomba = document.getElementById("statusBomba");
+    elBomba.innerText = bomba ? "LIGADA (Água Filtrada)" : "DESLIGADA";
+    elBomba.className = bomba ? "ativo-texto" : "";
+
+    document.getElementById("faseTexto").innerText = fase;
+  }
+
+  setInterval(() => {
+    const leituraLDR = parseInt(ldrSlider.value);
+    ldrValor.innerText = leituraLDR;
+
+    if (leituraLDR < limiarDeteccao && !cicloEmAndamento) {
+      executarCicloLavagem();
+    }
+  }, 200);
+
+  async function executarCicloLavagem() {
+    cicloEmAndamento = true;
+
+    // Fase 1: Liberação de Entrada
+    atualizarComponentes({
+      vermelho: false, verde: true, cancela: 90, escovas: false, bomba: false,
+      fase: "Fase 1: Liberação de Entrada (3.5s)"
+    });
+    await delay(3500);
+
+    // Fase 2: Bloqueio e Início do Processamento
+    atualizarComponentes({
+      vermelho: true, verde: false, cancela: 0, escovas: false, bomba: false,
+      fase: "Fase 2: Bloqueio e Início (1s)"
+    });
+    await delay(1000);
+
+    // Fase 3: Esfregagem Automatizada
+    atualizarComponentes({
+      vermelho: true, verde: false, cancela: 0, escovas: true, bomba: false,
+      fase: "Fase 3: Esfregagem Automatizada (5s)"
+    });
+    await delay(5000);
+
+    // Fase 4: Enxágue Otimizado
+    atualizarComponentes({
+      vermelho: true, verde: false, cancela: 0, escovas: false, bomba: true,
+      fase: "Fase 4: Enxágue com Água Filtrada (4s)"
+    });
+    await delay(4000);
+
+    // Fase 5: Saída Liberada
+    atualizarComponentes({
+      vermelho: false, verde: true, cancela: 90, escovas: false, bomba: false,
+      fase: "Fase 5: Saída Liberada (4s)"
+    });
+    await delay(4000);
+
+    // Retorno ao repouso
+    ldrSlider.value = 800;
+    ldrValor.innerText = 800;
+    atualizarComponentes({
+      vermelho: true, verde: false, cancela: 0, escovas: false, bomba: false,
+      fase: "Aguardando veículo..."
+    });
+
+    cicloEmAndamento = false;
+  }
+
+  function simularCarro() {
+    ldrSlider.value = 250;
+    ldrValor.innerText = 250;
+  }
+</script>
+
+</body>
+</html>
