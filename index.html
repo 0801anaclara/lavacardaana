@@ -4,93 +4,8 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Simulador - Lava-Jato Automatizado</title>
-  <style>
-    body {
-      font-family: Arial, sans-serif;
-      background-color: #121212;
-      color: #f0f0f0;
-      display: flex;
-      justify-content: center;
-      padding: 30px;
-    }
-    .painel {
-      background-color: #1e1e1e;
-      border-radius: 12px;
-      padding: 25px;
-      width: 100%;
-      max-width: 500px;
-      box-shadow: 0 4px 15px rgba(0,0,0,0.5);
-    }
-    h2 {
-      margin-top: 0;
-      text-align: center;
-      color: #4fc3f7;
-    }
-    .sensor-box {
-      background: #2a2a2a;
-      padding: 15px;
-      border-radius: 8px;
-      margin-bottom: 20px;
-    }
-    input[type="range"] {
-      width: 100%;
-      margin: 10px 0;
-    }
-    .status-grid {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 12px;
-      margin-bottom: 20px;
-    }
-    .card {
-      background: #2a2a2a;
-      padding: 15px;
-      border-radius: 8px;
-      text-align: center;
-    }
-    .led {
-      width: 24px;
-      height: 24px;
-      border-radius: 50%;
-      margin: 8px auto;
-      background-color: #444;
-      transition: 0.3s;
-    }
-    .led.vermelho.ativo {
-      background-color: #ff3b30;
-      box-shadow: 0 0 12px #ff3b30;
-    }
-    .led.verde.ativo {
-      background-color: #34c759;
-      box-shadow: 0 0 12px #34c759;
-    }
-    .ativo-texto {
-      color: #4fc3f7;
-      font-weight: bold;
-    }
-    .fase-atual {
-      background: #0d47a1;
-      padding: 15px;
-      border-radius: 8px;
-      text-align: center;
-      font-weight: bold;
-      font-size: 1.1em;
-    }
-    button {
-      width: 100%;
-      padding: 12px;
-      background-color: #0288d1;
-      color: white;
-      border: none;
-      border-radius: 6px;
-      font-size: 1em;
-      cursor: pointer;
-      margin-top: 10px;
-    }
-    button:hover {
-      background-color: #0277bd;
-    }
-  </style>
+  <!-- Vincula o arquivo CSS separado -->
+  <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
@@ -129,7 +44,7 @@
       <p id="statusEscovas">DESLIGADAS</p>
     </div>
 
-    <div class="card" style="grid-column: span 2;">
+    <div class="card card-largo">
       <div>Bomba de Enxágue (Pino 7)</div>
       <p id="statusBomba">DESLIGADA</p>
     </div>
@@ -141,19 +56,16 @@
 </div>
 
 <script>
-  // Constantes equivalentes ao código Arduino
   const limiarDeteccao = 400;
   let cicloEmAndamento = false;
 
   const ldrSlider = document.getElementById("ldrSlider");
   const ldrValor = document.getElementById("ldrValor");
 
-  // Função auxiliar para simular o delay() do Arduino
   function delay(ms) {
     return new Promise(resolve => setTimeout(resolve, ms));
   }
 
-  // Atualiza os elementos visuais na tela
   function atualizarComponentes({ vermelho, verde, cancela, escovas, bomba, fase }) {
     const elVermelho = document.getElementById("ledVermelho");
     const elVerde = document.getElementById("ledVerde");
@@ -177,7 +89,6 @@
     document.getElementById("faseTexto").innerText = fase;
   }
 
-  // Equivalente à função void loop()
   setInterval(() => {
     const leituraLDR = parseInt(ldrSlider.value);
     ldrValor.innerText = leituraLDR;
@@ -187,7 +98,6 @@
     }
   }, 200);
 
-  // Equivalente à função void executarCicloLavagem()
   async function executarCicloLavagem() {
     cicloEmAndamento = true;
 
@@ -227,7 +137,7 @@
     await delay(4000);
 
     // Retorno ao repouso
-    ldrSlider.value = 800; // Restaura luminosidade após saída do carro
+    ldrSlider.value = 800;
     ldrValor.innerText = 800;
     atualizarComponentes({
       vermelho: true, verde: false, cancela: 0, escovas: false, bomba: false,
@@ -237,7 +147,6 @@
     cicloEmAndamento = false;
   }
 
-  // Botão rápido para testar sem precisar arrastar o controle
   function simularCarro() {
     ldrSlider.value = 250;
     ldrValor.innerText = 250;
