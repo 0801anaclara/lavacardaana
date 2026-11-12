@@ -1,6 +1,6 @@
 body {
   font-family: Arial, sans-serif;
-  background-color: #070d1f; /* Azul escuro profundo no fundo */
+  background-color: #070d1f;
   color: #ffffff;
   display: flex;
   justify-content: center;
@@ -8,8 +8,8 @@ body {
 }
 
 .painel {
-  background-color: #0f1c3f; /* Azul escuro principal */
-  border: 2px solid #ff2a85; /* Borda rosa vibrante */
+  background-color: #0f1c3f; 
+  border: 2px solid #ff2a85;
   border-radius: 12px;
   padding: 25px;
   width: 100%;
@@ -20,12 +20,12 @@ body {
 h2 {
   margin-top: 0;
   text-align: center;
-  color: #ffdd00; /* Amarelo vibrante no título */
+  color: #ffdd00;
 }
 
 .sensor-box {
-  background: #172a5e; /* Azul escuro intermediário */
-  border-left: 4px solid #ffdd00; /* Detalhe em amarelo */
+  background: #172a5e;
+  border-left: 4px solid #ffdd00;
   padding: 15px;
   border-radius: 8px;
   margin-bottom: 20px;
@@ -34,7 +34,7 @@ h2 {
 input[type="range"] {
   width: 100%;
   margin: 10px 0;
-  accent-color: #ff2a85; /* Controle deslizante em rosa */
+  accent-color: #ff2a85;
 }
 
 .status-grid {
@@ -45,7 +45,7 @@ input[type="range"] {
 }
 
 .card {
-  background: #172a5e; /* Azul escuro intermediário */
+  background: #172a5e; 
   border: 1px solid #26428b;
   padding: 15px;
   border-radius: 8px;
@@ -76,13 +76,13 @@ input[type="range"] {
 }
 
 .ativo-texto {
-  color: #ffdd00; /* Amarelo para destacar status ativos */
+  color: #ffdd00;
   font-weight: bold;
 }
 
 .fase-atual {
-  background: #ffdd00; /* Destaque amarelo na barra de fase */
-  color: #070d1f; /* Texto azul escuro para leitura nítida */
+  background: #ffdd00;
+  color: #070d1f;
   padding: 15px;
   border-radius: 8px;
   text-align: center;
@@ -93,7 +93,7 @@ input[type="range"] {
 button {
   width: 100%;
   padding: 12px;
-  background-color: #ff2a85; /* Botão rosa vibrante */
+  background-color: #ff2a85;
   color: #ffffff;
   font-weight: bold;
   border: none;
@@ -105,6 +105,6 @@ button {
 }
 
 button:hover {
-  background-color: #d91b6c; /* Rosa mais escuro ao passar o mouse */
+  background-color: #d91b6c;
 }
 
