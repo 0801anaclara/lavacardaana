@@ -3,8 +3,8 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Simulador - Lava-Jato Automatizado</title>
-  <!-- Vincula o arquivo CSS separado -->
+  <title> Simulador - Lava-Jato Automatizado da Ana </title>
+
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
@@ -12,7 +12,6 @@
 <div class="painel">
   <h2>Lava-Jato Automatizado</h2>
 
-  <!-- Simulação do Sensor LDR (Pino A0) -->
   <div class="sensor-box">
     <label for="ldrSlider"><strong>Sensor LDR (Luminosidade):</strong> <span id="ldrValor">800</span></label>
     <input type="range" id="ldrSlider" min="0" max="1023" value="800">
@@ -20,7 +19,6 @@
     <button onclick="simularCarro()">Simular Passagem do Carro</button>
   </div>
 
-  <!-- Componentes de Saída -->
   <div class="status-grid">
     <div class="card">
       <div>LED Vermelho (Pino 2)</div>
@@ -101,42 +99,36 @@
   async function executarCicloLavagem() {
     cicloEmAndamento = true;
 
-    // Fase 1: Liberação de Entrada
+  
     atualizarComponentes({
       vermelho: false, verde: true, cancela: 90, escovas: false, bomba: false,
       fase: "Fase 1: Liberação de Entrada (3.5s)"
     });
     await delay(3500);
-
-    // Fase 2: Bloqueio e Início do Processamento
     atualizarComponentes({
       vermelho: true, verde: false, cancela: 0, escovas: false, bomba: false,
       fase: "Fase 2: Bloqueio e Início (1s)"
     });
     await delay(1000);
 
-    // Fase 3: Esfregagem Automatizada
     atualizarComponentes({
       vermelho: true, verde: false, cancela: 0, escovas: true, bomba: false,
       fase: "Fase 3: Esfregagem Automatizada (5s)"
     });
     await delay(5000);
 
-    // Fase 4: Enxágue Otimizado
     atualizarComponentes({
       vermelho: true, verde: false, cancela: 0, escovas: false, bomba: true,
       fase: "Fase 4: Enxágue com Água Filtrada (4s)"
     });
     await delay(4000);
 
-    // Fase 5: Saída Liberada
     atualizarComponentes({
       vermelho: false, verde: true, cancela: 90, escovas: false, bomba: false,
       fase: "Fase 5: Saída Liberada (4s)"
     });
     await delay(4000);
 
-    // Retorno ao repouso
     ldrSlider.value = 800;
     ldrValor.innerText = 800;
     atualizarComponentes({
