@@ -1,0 +1,98 @@
+
+import tkinter as tk
+import random
+
+r = tk.Tk()
+r.title("Jogo m/s e km/h")
+r.geometry("400x400")
+
+c = tk.Canvas(r, width=400, height=400, bg="white")
+c.pack()
+
+bx, bolx, boly, pts, vel, ativo, keys = 160, random.randint(50, 350), 0, 0, 4.0, True, {}
+
+r.bind("<KeyPress>", lambda e: keys.update({e.keysym: True}))
+r.bind("<KeyRelease>", lambda e: keys.update({e.keysym: False}))
+
+
+def reiniciar(e=None):
+    global bx, bolx, boly, pts, vel, ativo
+
+    bx, bolx, boly, pts, vel, ativo = 160, random.randint(50, 350), 0, 0, 4.0, True
+
+    loop()
+
+
+r.bind("<space>", reiniciar)
+
+
+def loop():
+    global bx, boly, bolx, pts, vel, ativo
+
+    if not ativo:
+        return
+
+    if keys.get("Left") and bx > 0:
+        bx -= 12
+
+    if keys.get("Right") and bx < 300:
+        bx += 12
+
+    vel += 0.005
+    boly += int(vel)
+
+    if boly > 400:
+        ativo = False
+
+    if 350 < boly < 370 and bx < bolx < bx + 100:
+        pts += 1
+        boly = 0
+        bolx = random.randint(50, 350)
+
+    c.delete("all")
+
+    c.create_text(
+        200, 15,
+        text="[<][>] para mover",
+        font=("Arial", 9, "bold")
+    )
+
+    c.create_text(
+        60, 35,
+        text=f"Pts: {pts}",
+        font=("Arial", 9, "bold"),
+        fill="blue"
+    )
+
+    c.create_text(
+        290, 35,
+        text=f"Vel: {vel:.1f}m/s ({vel * 3.6:.1f}km/h)",
+        font=("Arial", 9, "bold"),
+        fill="red"
+    )
+
+    c.create_rectangle(
+        bx, 360, bx + 100, 370,
+        fill="blue"
+    )
+
+    c.create_oval(
+        bolx - 10, boly - 10,
+        bolx + 10, boly + 10,
+        fill="red"
+    )
+
+    if not ativo:
+        c.create_text(
+            200, 190,
+            text="FIM DE JOGO\n[ESPAÇO] Recomeçar",
+            font=("Arial", 16, "bold"),
+            fill="red",
+            justify="center"
+        )
+    else:
+        r.after(25, loop)
+
+
+loop()
+r.mainloop()
